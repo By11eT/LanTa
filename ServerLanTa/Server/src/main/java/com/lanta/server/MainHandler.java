@@ -24,6 +24,7 @@ public class MainHandler extends SimpleChannelInboundHandler<String> {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
         System.out.println("Получено сообщение: " + s);
+
         if (s.startsWith("/")) {
             if (s.startsWith("/changename ")) { // /changename myname1
                 String newNickname = s.split("\\s", 2)[1];

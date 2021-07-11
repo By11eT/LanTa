@@ -9,6 +9,11 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+
+import java.util.UUID;
 
 public class ServerApp {
     private static final int PORT = 8000;
@@ -27,6 +32,19 @@ public class ServerApp {
                         }
                     });
             ChannelFuture future = b.bind(PORT).sync();
+
+            /* Подключение к MQTT брокеру + 1 публикация
+                String publisherId = UUID.randomUUID().toString();
+                IMqttClient publisher = new MqttClient("tcp://37.235.251.37:1883",publisherId);
+                MqttConnectOptions options = new MqttConnectOptions();
+                options.setAutomaticReconnect(true);
+                options.setCleanSession(true);
+                options.setConnectionTimeout(10);
+                publisher.connect(options);
+                MqttPublisher mqttPublisher =  new MqttPublisher(publisher);
+                mqttPublisher.call();
+            */
+
             future.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();

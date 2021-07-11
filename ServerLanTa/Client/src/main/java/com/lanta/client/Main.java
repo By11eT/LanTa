@@ -13,7 +13,7 @@ public class Main extends Application {
         Parent root = fxmlLoader.load();
         Controller controller = fxmlLoader.getController();
         primaryStage.setOnCloseRequest(event -> controller.exitAction());
-        primaryStage.setTitle("Geek Chat Client");
+        primaryStage.setTitle("Chat Client");
         primaryStage.setScene(new Scene(root, 400, 400));
         primaryStage.show();
     }
