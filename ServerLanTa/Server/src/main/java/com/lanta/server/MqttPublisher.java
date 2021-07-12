@@ -6,7 +6,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import java.util.concurrent.Callable;
 
 public class MqttPublisher  {
-    private static final String TOPIC = "bike/T0001";
+    private static final String TOPIC = "bike";
     private IMqttClient client;
 
     public MqttPublisher(IMqttClient client) {

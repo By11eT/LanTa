@@ -19,20 +19,23 @@ import java.util.UUID;
 public class ServerApp {
     private static final int PORT = 8000;
 
-    public static void main(String[] args) throws MqttException {
+    public static void main(String[] args) throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         String publisherId = UUID.randomUUID().toString();
 
-        IMqttClient publisher = new MqttClient("tcp://localhost:1883",publisherId);
+        IMqttClient client = new MqttClient("tcp://iot.lanta.me:1883",publisherId);
         MqttConnectOptions options = new MqttConnectOptions();
+        options.setUserName("manager");
+        options.setPassword("Zoopooy3ien5".toCharArray());
         options.setAutomaticReconnect(true);
         options.setCleanSession(true);
         options.setConnectionTimeout(10);
-        publisher.connect(options);
+        client.connect(options);
 
-        final MqttPublisher mqttPublisher =  new MqttPublisher(publisher);
-
+        //final MqttPublisher mqttPublisher =  new MqttPublisher(client);
+        final MqttSubscriber mqttSubscriber = new MqttSubscriber(client);
+        mqttSubscriber.call();
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
@@ -40,7 +43,7 @@ public class ServerApp {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new StringDecoder(), new StringEncoder(), new MainHandler(mqttPublisher));
+                            socketChannel.pipeline().addLast(new StringDecoder(), new StringEncoder(), new MainHandler(null));
                         }
                     });
             ChannelFuture future = b.bind(PORT).sync();
@@ -50,7 +53,7 @@ public class ServerApp {
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
-            publisher.close();
+            client.disconnect();
         }
     }
 }
