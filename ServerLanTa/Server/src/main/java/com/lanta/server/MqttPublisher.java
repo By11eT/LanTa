@@ -5,29 +5,27 @@ import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import java.util.concurrent.Callable;
 
-public class MqttPublisher implements Callable {
+public class MqttPublisher  {
     private static final String TOPIC = "bike/T0001";
     private IMqttClient client;
 
     public MqttPublisher(IMqttClient client) {
         this.client = client;
     }
-    @Override
-    public Void call() throws Exception {
+
+    public Void call(String s) throws Exception {
         if ( !client.isConnected()) {
             return null;
         }
-        MqttMessage msg = readEngineTemp();
+        MqttMessage msg = readEngine(s);
         msg.setQos(0);
         msg.setRetained(true);
         client.publish(TOPIC,msg);
         return null;
     }
 
-    private MqttMessage readEngineTemp() {
-        double temp =  80;
-        byte[] payload = String.format("T:%04.2f",temp)
-                .getBytes();
+    private MqttMessage readEngine(String s) {
+        byte[] payload = s.getBytes();
         MqttMessage mqttMessage = new MqttMessage(payload);
         return mqttMessage;
     }
