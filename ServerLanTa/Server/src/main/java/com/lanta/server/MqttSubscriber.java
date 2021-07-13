@@ -19,7 +19,8 @@ public class MqttSubscriber {
         client.subscribe(TOPIC, (topic, msg) -> {
             byte[] payload = msg.getPayload();
             this.str = new String(payload,"UTF-8");
-            System.out.println(str);
+
+            MainHandler.broadcastMessage(str);
         });
 
         return null;

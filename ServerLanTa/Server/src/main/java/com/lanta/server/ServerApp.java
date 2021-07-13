@@ -39,6 +39,7 @@ public class ServerApp {
                         }
                     });
             ChannelFuture future = b.bind(PORT).sync();
+
             future.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();

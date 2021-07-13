@@ -11,7 +11,7 @@ public class MainHandler extends SimpleChannelInboundHandler<String> {
     private static final List<Channel> channels = new ArrayList<>();
     private static int newClientIndex = 1;
     private String clientName;
-    private MqttPublisher mqttPublisher;
+    private static MqttPublisher mqttPublisher;
 
     public MainHandler(MqttPublisher mqttPublisher){
        this.mqttPublisher=mqttPublisher;
@@ -23,36 +23,25 @@ public class MainHandler extends SimpleChannelInboundHandler<String> {
         channels.add(ctx.channel());
         clientName = "Клиент #" + newClientIndex;
         newClientIndex++;
-        broadcastMessage("SERVER", "Подключился новый клиент: " + clientName);
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
-        System.out.println("Получено сообщение: " + s);
 
-        if (s.startsWith("/")) {
-            if (s.startsWith("/changename ")) { // /changename myname1
-                String newNickname = s.split("\\s", 2)[1];
-                broadcastMessage("SERVER", "Клиент " + clientName + " сменил ник на " + newNickname);
-                clientName = newNickname;
-            }
-            return;
-        }
-        broadcastMessage(clientName, s);
     }
 
-    public void broadcastMessage(String clientName, String message) {
-        String out = String.format("[%s]: %s\n", clientName, message);
+    public static void broadcastMessage(String str) throws Exception {
+        String out = str+"\n";
         for (Channel c : channels) {
             c.writeAndFlush(out);
         }
+        mqttPublisher.call(str);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Клиент " + clientName + " вышел из сети");
         channels.remove(ctx.channel());
-        broadcastMessage("SERVER", "Клиент " + clientName + " вышел из сети");
         ctx.close();
     }
 
@@ -60,7 +49,6 @@ public class MainHandler extends SimpleChannelInboundHandler<String> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         System.out.println("Клиент " + clientName + " отвалился");
         channels.remove(ctx.channel());
-        broadcastMessage("SERVER", "Клиент " + clientName + " вышел из сети");
         ctx.close();
     }
 }
