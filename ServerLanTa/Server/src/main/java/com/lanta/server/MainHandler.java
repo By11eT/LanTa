@@ -3,18 +3,18 @@ package com.lanta.server;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainHandler extends SimpleChannelInboundHandler<String> {
+
     private static final List<Channel> channels = new ArrayList<>();
     private static int newClientIndex = 1;
     private String clientName;
-    //private MqttPublisher mqttPublisher;
+    private MqttPublisher mqttPublisher;
 
     public MainHandler(MqttPublisher mqttPublisher){
-       // this.mqttPublisher=mqttPublisher;
+       this.mqttPublisher=mqttPublisher;
     }
 
     @Override
@@ -29,14 +29,7 @@ public class MainHandler extends SimpleChannelInboundHandler<String> {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
         System.out.println("Получено сообщение: " + s);
-        /*if(s.startsWith("*")){
-            if (s.startsWith("*aboba ")) { // /changename myname1
-                String newNickname = s.split("\\s", 2)[1];
-                mqttPublisher.call(newNickname);
-                broadcastMessage("SERVER", "Клиент " + clientName + " отправил запрос " + newNickname);
-            }
-            return;
-        }*/
+
         if (s.startsWith("/")) {
             if (s.startsWith("/changename ")) { // /changename myname1
                 String newNickname = s.split("\\s", 2)[1];

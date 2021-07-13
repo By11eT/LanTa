@@ -9,33 +9,22 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
-import org.eclipse.paho.client.mqttv3.IMqttClient;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-
-import java.util.UUID;
 
 public class ServerApp {
     private static final int PORT = 8000;
 
     public static void main(String[] args) throws Exception {
+
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        String publisherId = UUID.randomUUID().toString();
 
-        IMqttClient client = new MqttClient("tcp://iot.lanta.me:1883",publisherId);
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName("manager");
-        options.setPassword("Zoopooy3ien5".toCharArray());
-        options.setAutomaticReconnect(true);
-        options.setCleanSession(true);
-        options.setConnectionTimeout(10);
-        client.connect(options);
+        MqttClientConnect client1 = new MqttClientConnect("test");
+        MqttClientConnect client2 = new MqttClientConnect("lanta");
 
-        //final MqttPublisher mqttPublisher =  new MqttPublisher(client);
-        final MqttSubscriber mqttSubscriber = new MqttSubscriber(client);
+        final MqttPublisher mqttPublisher =  new MqttPublisher(client1.MqttClientConnect());
+        final MqttSubscriber mqttSubscriber = new MqttSubscriber(client2.MqttClientConnect());
         mqttSubscriber.call();
+
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
@@ -43,7 +32,10 @@ public class ServerApp {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new StringDecoder(), new StringEncoder(), new MainHandler(null));
+                            socketChannel.pipeline().addLast(
+                                    new StringDecoder(),
+                                    new StringEncoder(),
+                                    new MainHandler(mqttPublisher));
                         }
                     });
             ChannelFuture future = b.bind(PORT).sync();
@@ -53,7 +45,8 @@ public class ServerApp {
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
-            client.disconnect();
+            client1.close();
+            client2.close();
         }
     }
 }

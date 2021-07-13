@@ -3,7 +3,6 @@ package com.lanta.server;
 
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import java.util.concurrent.Callable;
 
 public class MqttPublisher  {
     private static final String TOPIC = "bike";
