@@ -3,26 +3,26 @@ package com.lanta.server;
 public class parserMqttString {
 
     private static String str;
-    private static String battery;
-    private static String geolocation;
+    private static String battery="0";
+    private static String geolocation="0,0";
+    private static String power;
 
-    public static String getBattery() {
-        return battery;
+    public static String getInformation(){
+        String s = "Power:"+power+" Battery:"+battery+" Geolocation:"+geolocation;
+        return s;
     }
     public static String getGeolocation(){
         return geolocation;
     }
+
     public static void setStr(String str) {
         parserMqttString.str = str;
         parserStr();
     }
 
     private static void parserStr(){
-        System.out.println(str);
         str = str.replaceAll("[{}\"]", "");
-        System.out.println(str);
         str = str.replaceAll(" ","");
-        System.out.println(str);
         if(str.startsWith("a")){
             if(str.startsWith("a:27")){
                 String msg[]= str.split(",");
@@ -30,6 +30,13 @@ public class parserMqttString {
                     if(word.startsWith("b")){
                         battery = word.replaceAll("b:","");
                         System.out.println("Заряд батареи: "+battery);
+                    }
+                    if(word.startsWith("c")){
+                        power = word.replaceAll("c:","");
+                        if(power=="1"){
+                            power="Самокат выключен";
+                        }
+                        else power="Самокат включен";
                     }
                 }
             }

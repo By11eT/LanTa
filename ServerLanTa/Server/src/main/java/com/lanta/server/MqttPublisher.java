@@ -20,12 +20,15 @@ public class MqttPublisher  {
         msg.setQos(0);
         msg.setRetained(true);
         client.publish(TOPIC,msg);
+
         return null;
     }
 
     private MqttMessage readEngine(String s) {
+
         byte[] payload = s.getBytes();
         MqttMessage mqttMessage = new MqttMessage(payload);
         return mqttMessage;
+
     }
 }
