@@ -18,10 +18,10 @@ public class ServerApp {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-        MqttClientConnect client1 = new MqttClientConnect("test");
+        //MqttClientConnect client1 = new MqttClientConnect("test");
         MqttClientConnect client2 = new MqttClientConnect("lanta");
 
-        final MqttPublisher mqttPublisher =  new MqttPublisher(client1.MqttClientConnect());
+       // final MqttPublisher mqttPublisher =  new MqttPublisher(client1.MqttClientConnect());
         final MqttSubscriber mqttSubscriber = new MqttSubscriber(client2.MqttClientConnect());
         mqttSubscriber.call();
 
@@ -35,7 +35,7 @@ public class ServerApp {
                             socketChannel.pipeline().addLast(
                                     new StringDecoder(),
                                     new StringEncoder(),
-                                    new MainHandler(mqttPublisher));
+                                    new MainHandler(null));
                         }
                     });
             ChannelFuture future = b.bind(PORT).sync();
@@ -46,7 +46,7 @@ public class ServerApp {
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
-            client1.close();
+            //client1.close();
             client2.close();
         }
     }

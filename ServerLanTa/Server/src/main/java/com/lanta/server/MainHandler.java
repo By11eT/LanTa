@@ -27,15 +27,14 @@ public class MainHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
-
+        broadcastMessage();
     }
 
-    public static void broadcastMessage(String str) throws Exception {
-        String out = str+"\n";
+    public void broadcastMessage() {
+        String out = parserMqttString.getGeolocation();
         for (Channel c : channels) {
             c.writeAndFlush(out);
         }
-        mqttPublisher.call(str);
     }
 
     @Override
