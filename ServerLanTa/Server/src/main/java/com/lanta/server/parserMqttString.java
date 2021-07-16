@@ -5,7 +5,7 @@ public class parserMqttString {
     private static String str;
     private static String battery="0";
     private static String geolocation="0,0";
-    private static String power;
+    private static String power="1";
 
     public static String getInformation(){
         String s = "Power:"+power+" Battery:"+battery+" Geolocation:"+geolocation;
@@ -33,10 +33,7 @@ public class parserMqttString {
                     }
                     if(word.startsWith("c")){
                         power = word.replaceAll("c:","");
-                        if(power=="1"){
-                            power="Самокат выключен";
-                        }
-                        else power="Самокат включен";
+                        System.out.println("Статус: "+power);
                     }
                 }
             }

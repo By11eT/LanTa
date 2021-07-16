@@ -27,11 +27,25 @@ public class MainHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
+        if(s.startsWith("{\"a\"")){
+            switch (s){
+                case("{\"a\":1}"): {
+                    mqttPublisher.call(s);
+                    break;
+                }
+                case("{\"a\":18}"): {
+                    broadcastMessage();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
         broadcastMessage();
     }
 
     public void broadcastMessage() {
-        String out = parserMqttString.getGeolocation();
+        String out = parserMqttString.getInformation();
         for (Channel c : channels) {
             c.writeAndFlush(out);
         }
