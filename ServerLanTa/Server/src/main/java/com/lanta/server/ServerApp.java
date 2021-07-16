@@ -18,10 +18,10 @@ public class ServerApp {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);//создание потока для принятия запросов на подключение
         EventLoopGroup workerGroup = new NioEventLoopGroup();//создание потоков для работы с клиентами
 
-        //MqttClientConnect client1 = new MqttClientConnect("test");//создание клиентов mqtt для publisher или subscribe
+        MqttClientConnect client1 = new MqttClientConnect("test");//создание клиентов mqtt для publisher или subscribe
         MqttClientConnect client2 = new MqttClientConnect("lanta");
 
-       // final MqttPublisher mqttPublisher =  new MqttPublisher(client1.MqttClientConnect());//создание publisher
+        final MqttPublisher mqttPublisher =  new MqttPublisher(client1.MqttClientConnect());//создание publisher
         final MqttSubscriber mqttSubscriber = new MqttSubscriber(client2.MqttClientConnect());//создание subscribe
         mqttSubscriber.call();//вызов прослушки mqtt-брокера для того,чтобы сервер получал message
 
@@ -35,7 +35,7 @@ public class ServerApp {
                             socketChannel.pipeline().addLast(//Handler'ы для pipeline , основа принятия и отправки сообщений между серверо и клиентом
                                     new StringDecoder(),
                                     new StringEncoder(),
-                                    new MainHandler(null));//наш handler
+                                    new MainHandler(mqttPublisher));//наш handler
                         }
                     });
             ChannelFuture future = b.bind(PORT).sync();//Запуск сервера

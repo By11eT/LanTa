@@ -13,6 +13,7 @@ public class MqttPublisher  {
     }
 
     public Void call(String s) throws Exception {
+        System.out.println(s);
         if ( !client.isConnected()) {
             return null;
         }

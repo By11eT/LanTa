@@ -14,11 +14,11 @@ public class MainHandler extends SimpleChannelInboundHandler<String> {
     private static MqttPublisher mqttPublisher;
 
     public MainHandler(MqttPublisher mqttPublisher){
-       this.mqttPublisher=mqttPublisher;
+       MainHandler.mqttPublisher =mqttPublisher;
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         System.out.println("Клиент подключился: " + ctx);
         channels.add(ctx.channel());
         clientName = "Клиент #" + newClientIndex;
@@ -27,21 +27,10 @@ public class MainHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
-        if(s.startsWith("{\"a\"")){
-            switch (s){
-                case("{\"a\":1}"): {
-                    mqttPublisher.call(s);
-                    break;
-                }
-                case("{\"a\":18}"): {
-                    broadcastMessage();
-                    break;
-                }
-                default:
-                    break;
-            }
+        if(s.startsWith("{\"a\":")){
+            mqttPublisher.call(s);
         }
-        broadcastMessage();
+        else broadcastMessage();
     }
 
     public void broadcastMessage() {
@@ -52,14 +41,14 @@ public class MainHandler extends SimpleChannelInboundHandler<String> {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         System.out.println("Клиент " + clientName + " вышел из сети");
         channels.remove(ctx.channel());
         ctx.close();
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         System.out.println("Клиент " + clientName + " отвалился");
         channels.remove(ctx.channel());
         ctx.close();
